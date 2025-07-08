@@ -19,11 +19,12 @@ contract rockPaperScissorsGame{
 
 
     event Winner(address _player);
-    event joinedGame(adrress _player2);
+    event joinedGame(address _player2);
+    event moveCommitted(addres _player)
 
 
-    error playerHasNotCommitted();
-    error invalidPlayerAddress();
+    error AlreadyCommitted();
+    error invalidPlayer();
     error AlreadyStarted();
    
 
@@ -32,14 +33,14 @@ contract rockPaperScissorsGame{
             addr: _player1,
             committedMoves: bytes32(0),
             revealedMoves: "",
-            hasCommited: false,
+            hasCommitted: false,
             hasRevealed: false,
             secret: ""
         });
     }
 
     function joinGame(address _player2) external{
-        if( !(_player2 == address(0)) ) revert invalidPlayerAddress();
+        if( !(_player2 == address(0)) ) revert invalidPlayer();
         if( !(hasStarted) ) revert AlreadyStarted();
 
         player2 = Player({
@@ -51,9 +52,31 @@ contract rockPaperScissorsGame{
             secret: ""
         })
 
-        bool hasStarted = true;
+        bool hasStarted = true; 
     }
-} 
+    function commitMoves(string memory _move, string memory _secret) external {
+     
+
+        bytes32 hash = keccak256(abi.encodePacked(_move, _secret));
+
+        if(msg.sender == player1.addr){
+
+            if( !(player1.hasCommited) ) revert AlreadyCommitted();
+            player1.committedMoves = hash;
+            player1.hasCommited = true;
+            player1.secret = _secret;
+
+        }else if(msg.sender == player2.addr){
+
+            if( !(player2.hasCommited) ) revert AlreadyCommitted();
+            player2.committedMoves = hash;
+            player2.hasCommited = true;
+             player2.secret = _secret;
+        }
+
+        emit  moveCommitted(player);
+    }
+}  
 
 
 contract gameSessionFactory{
