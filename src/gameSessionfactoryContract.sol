@@ -4,18 +4,20 @@ pragma solidity ^0.8.13;
 
 contract rockPaperScissorsGame{
 
+    enum GameResult = (pending, Draw, player1Wins, player2Wins);
+
     struct Player{
         address addr;
-        bytes32 committedMoves;
-        string  revealedMoves;
+        string committedMove;
         bool hasCommitted;
-        bool hasRevealed;
-        string secret; 
+        string revealMove;
     }
     Player public player1;
-    Player player2;
-    bool hasStarted;
-    bool hasended;
+    Player public player2;
+    bool public hasStarted;
+    bool public  hasended;
+
+    GameResult public result;
 
 
     event Winner(address _player);
@@ -24,19 +26,21 @@ contract rockPaperScissorsGame{
 
 
     error AlreadyCommitted();
+    error mustCommit();
     error invalidPlayer();
     error AlreadyStarted();
+    error wrongHash();
    
 
     constructor(address _player1) {
         player1 = Player({
             addr: _player1,
-            committedMoves: bytes32(0),
-            revealedMoves: "",
+            committedMove: "",
             hasCommitted: false,
-            hasRevealed: false,
-            secret: ""
+            revealedMove: ""
         });
+
+        result = result.pending;
     }
 
     function joinGame(address _player2) external{
@@ -45,39 +49,41 @@ contract rockPaperScissorsGame{
 
         player2 = Player({
             addr: _player2;
-            committedMoves: bytes32(0),
-            revealedMoves: "",
+            committedMove: ,
             hasCommited: false,
-            hasRevealed: false,
-            secret: ""
+            revealedMove ""
+            
         })
 
         bool hasStarted = true; 
     }
-    function commitMoves(string memory _move, string memory _secret) external {
+    function commitMoves(string memory _move, address _player) external {
      
 
-        bytes32 hash = keccak256(abi.encodePacked(_move, _secret));
+        // bytes32 hash = keccak256(abi.encodePacked(_move, _secret));
 
         if(msg.sender == player1.addr){
 
             if( !(player1.hasCommited) ) revert AlreadyCommitted();
-            player1.committedMoves = hash;
-            player1.hasCommited = true;
-            player1.secret = _secret;
+            player1.committedMove = _move;
+            player1.hasCommitted = true;
 
         }else if(msg.sender == player2.addr){
 
             if( !(player2.hasCommited) ) revert AlreadyCommitted();
-            player2.committedMoves = hash;
-            player2.hasCommited = true;
-             player2.secret = _secret;
+            player2.committedMove = hash;
+            player2.hasCommitted = true;
+
+        } else{
+
+            "invalid Player";
         }
 
-        emit  moveCommitted(player);
+        emit  moveCommitted(_player);
+       
     }
-}  
 
+}
 
 contract gameSessionFactory{
     
