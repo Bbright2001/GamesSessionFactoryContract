@@ -69,7 +69,7 @@ contract rockPaperScissorGame{
         }else if(msg.sender == player2.addr){
 
             if( !(player2.hasCommitted) ) revert AlreadyCommitted();
-            player2.committedMove = "";
+            player2.committedMove = _move;
             player2.hasCommitted = true;
 
         } else{
@@ -166,6 +166,10 @@ contract gameSessionFactory{
 
     function getAllChildContractAddress() external view returns (uint256){
         return deployedGameSession.length;
+    }
+
+    function getDeployedContract() external view returns (address [] memory){
+        return deployedGameSession;
     }
     
 }
