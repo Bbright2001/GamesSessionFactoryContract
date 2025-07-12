@@ -58,24 +58,20 @@ contract rockPaperScissorGame{
          hasStarted = true; 
     }
     function commitMoves(string memory _move) external {
+        require(player1.addr == msg.sender || player2.addr == msg.sender);
         require(validMove(_move), "Invalid Move");
 
-        if(msg.sender == player1.addr){
 
-            if( !(player1.hasCommitted) ) revert AlreadyCommitted();
-            player1.committedMove = _move;
-            player1.hasCommitted = true;
-
-        }else if(msg.sender == player2.addr){
-
-            if( !(player2.hasCommitted) ) revert AlreadyCommitted();
-            player2.committedMove = _move;
-            player2.hasCommitted = true;
-
-        } else{
-
-            
-        }
+        if (msg.sender == player1.addr) {
+    require(!player1.hasCommitted, "Already committed");
+    player1.committedMove = _move;
+    player1.hasCommitted = true;
+} else {
+    require(!player2.hasCommitted, "Already committed");
+    player2.committedMove = _move;
+    player2.hasCommitted = true;
+}
+        
 
         emit  moveCommitted();
 
